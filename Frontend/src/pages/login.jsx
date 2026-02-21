@@ -32,27 +32,28 @@ const Login = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-base-200 px-4 transition-colors duration-500 font-sans relative overflow-hidden">
+        <div className="min-h-screen flex items-center justify-center bg-[#060010] px-4 transition-colors duration-500 font-sans relative overflow-hidden" data-theme="dark">
 
-            {/* Background Animation */}
+            {/* Background Animation - Smaller Cubes, Subtle Dark Theme */}
             <div className="absolute inset-0 z-0">
                 <Cubes
-                    gridSize={8}
-                    maxAngle={45}
-                    radius={3}
-                    borderStyle="2px dashed #B19EEF"
-                    faceColor="#1a1a2e"
-                    rippleColor="#ff6b6b"
-                    rippleSpeed={1.5}
+                    gridSize={16}
+                    maxAngle={30}
+                    radius={2}
+                    borderStyle="1px solid rgba(177, 158, 239, 0.05)"
+                    faceColor="transparent"
+                    rippleColor="#641ae6"
+                    rippleSpeed={0.5}
                     autoAnimate
                     rippleOnClick
                 />
             </div>
 
-            <div className="card w-full max-w-lg bg-base-100/90 backdrop-blur-md shadow-2xl relative z-10 overflow-visible border border-base-content/5">
+            <div className="card w-full max-w-lg bg-black/40 backdrop-blur-3xl shadow-2xl relative z-10 overflow-visible border border-white/5">
 
                 <form className="card-body items-center text-center p-8 sm:p-12" onSubmit={handleLogin}>
-                    <h2 className="card-title text-3xl font-bold tracking-tight mb-2">Welcome Back</h2>
+                    <h2 className="card-title text-3xl font-black italic tracking-tighter mb-2 text-white">SYSTEM ACCESS</h2>
+                    <p className="text-[10px] opacity-30 font-black uppercase tracking-[0.5em] mb-6">FleetFlow Synthetic Telemetry Link</p>
 
                     {/* Avatar */}
                     <div className="avatar mt-4 mb-2">
