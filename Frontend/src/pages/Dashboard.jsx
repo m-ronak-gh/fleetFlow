@@ -2,13 +2,31 @@ import React, { useState } from 'react';
 import {
     Search, Plus, Filter, Truck, AlertTriangle, Package,
     ChevronRight, Home, Settings, BarChart3, Users, Clock,
-    LayoutGrid, ListFilter, SlidersHorizontal, Menu, X
+    LayoutGrid, ListFilter, SlidersHorizontal, Menu, X,
+    Wrench, Wallet, MapPin, Gauge
 } from 'lucide-react';
 import userAvatar from '../assets/user.png';
 import Cubes from '../components/Cubes';
+import RegistrationModal from '../components/RegistrationModal';
+import TripModal from '../components/TripModal';
+import ServiceModal from '../components/ServiceModal';
 
 const Dashboard = () => {
     const [isNavOpen, setIsNavOpen] = useState(false);
+    const [activeTab, setActiveTab] = useState('dashboard');
+    const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
+    const [isTripModalOpen, setIsTripModalOpen] = useState(false);
+    const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+
+    const navItems = [
+        { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
+        { id: 'vehicles', label: 'Vehicle Registration', icon: Truck },
+        { id: 'dispatch', label: 'Trip Dispatch', icon: MapPin },
+        { id: 'maintenance', label: 'Maintenance', icon: Wrench },
+        { id: 'expense', label: 'Trip Expense', icon: Wallet },
+        { id: 'performance', label: 'Performance', icon: Gauge },
+        { id: 'analytics', label: 'Analytics', icon: BarChart3 },
+    ];
 
     return (
         <div className="min-h-screen bg-[#060010] p-4 md:p-8 font-sans relative overflow-hidden flex flex-col md:flex-row gap-6">
@@ -60,20 +78,28 @@ const Dashboard = () => {
                     </button>
                 </div>
 
-                {/* Nav Buttons (Hidden when !isNavOpen on mobile, vertical stack on desktop) */}
-                <div className={`w-full px-4 space-y-4 mb-8 transition-all duration-700 ${isNavOpen ? 'opacity-100 flex flex-col' : 'opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto flex flex-col'}`}>
-                    <button className={`w-full flex items-center ${isNavOpen ? 'justify-start px-6 gap-4' : 'justify-center'} p-4 text-white bg-primary rounded-[1.5rem] transition-all shadow-lg shadow-primary/20 hover:scale-[1.02]`}>
-                        <Home size={24} />
-                        {isNavOpen && <span className="font-bold text-sm tracking-widest uppercase animate-in fade-in slide-in-from-left-2 duration-300">Dashboard</span>}
-                    </button>
-                    <button className={`w-full flex items-center ${isNavOpen ? 'justify-start px-6 gap-4' : 'justify-center'} p-4 text-white/40 hover:text-white hover:bg-white/5 rounded-[1.5rem] transition-all group`}>
-                        <BarChart3 size={24} className="group-hover:text-primary transition-colors" />
-                        {isNavOpen && <span className="font-bold text-sm tracking-widest uppercase text-left animate-in fade-in slide-in-from-left-2 duration-300">Intelligence</span>}
-                    </button>
-                    <button className={`w-full flex items-center ${isNavOpen ? 'justify-start px-6 gap-4' : 'justify-center'} p-4 text-white/40 hover:text-white hover:bg-white/5 rounded-[1.5rem] transition-all group`}>
-                        <Users size={24} className="group-hover:text-primary transition-colors" />
-                        {isNavOpen && <span className="font-bold text-sm tracking-widest uppercase animate-in fade-in slide-in-from-left-2 duration-300">Operators</span>}
-                    </button>
+                {/* Nav Buttons (Scrollable list for many items) */}
+                <div className={`w-full px-4 space-y-2 mb-8 flex-1 overflow-y-auto no-scrollbar transition-all duration-700 ${isNavOpen ? 'opacity-100 flex flex-col' : 'opacity-0 md:opacity-100 pointer-events-none md:pointer-events-auto flex flex-col'}`}>
+                    {navItems.map((item) => (
+                        <button
+                            key={item.id}
+                            onClick={() => {
+                                setActiveTab(item.id);
+                                if (item.id === 'maintenance') setIsServiceModalOpen(true);
+                            }}
+                            className={`w-full flex items-center ${isNavOpen ? 'justify-start px-6 gap-4' : 'justify-center'} p-4 rounded-[1.5rem] transition-all group shrink-0 ${activeTab === item.id
+                                ? 'text-white bg-primary shadow-lg shadow-primary/20 scale-[1.02]'
+                                : 'text-white/40 hover:text-white hover:bg-white/5'
+                                }`}
+                        >
+                            <item.icon size={22} className={`${activeTab === item.id ? 'text-white' : 'group-hover:text-primary transition-colors'}`} />
+                            {isNavOpen && (
+                                <span className={`font-bold text-[10px] tracking-widest uppercase text-left whitespace-nowrap animate-in fade-in slide-in-from-left-2 duration-300`}>
+                                    {item.label}
+                                </span>
+                            )}
+                        </button>
+                    ))}
                 </div>
 
                 {/* Profile / Bottom Area */}
@@ -130,10 +156,16 @@ const Dashboard = () => {
                     </div>
 
                     <div className="flex gap-4">
-                        <button className="flex-1 btn btn-primary rounded-[1.8rem] px-10 h-16 shadow-lg shadow-primary/20 border-none font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform flex gap-3">
+                        <button
+                            onClick={() => setIsTripModalOpen(true)}
+                            className="flex-1 btn btn-primary rounded-[1.8rem] px-10 h-16 shadow-lg shadow-primary/20 border-none font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform flex gap-3"
+                        >
                             <Plus size={22} className="text-white" /> New Trip
                         </button>
-                        <button className="flex-1 btn bg-white/10 hover:bg-white/20 text-white rounded-[1.8rem] px-10 h-16 shadow-xl border border-white/10 font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform flex gap-3">
+                        <button
+                            onClick={() => setIsVehicleModalOpen(true)}
+                            className="flex-1 btn bg-white/10 hover:bg-white/20 text-white rounded-[1.8rem] px-10 h-16 shadow-xl border border-white/10 font-black uppercase tracking-widest text-xs hover:scale-105 transition-transform flex gap-3"
+                        >
                             <Truck size={22} className="opacity-60" /> New Vehicle
                         </button>
                     </div>
@@ -296,6 +328,20 @@ const Dashboard = () => {
                     </div>
                 </div>
             </main>
+
+            {/* Modal Overlays */}
+            <RegistrationModal
+                isOpen={isVehicleModalOpen}
+                onClose={() => setIsVehicleModalOpen(false)}
+            />
+            <TripModal
+                isOpen={isTripModalOpen}
+                onClose={() => setIsTripModalOpen(false)}
+            />
+            <ServiceModal
+                isOpen={isServiceModalOpen}
+                onClose={() => setIsServiceModalOpen(false)}
+            />
         </div>
     );
 };
