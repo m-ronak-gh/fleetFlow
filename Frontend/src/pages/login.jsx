@@ -4,6 +4,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../context/AuthContext';
 import userAvatar from '../assets/user.png';
+import Cubes from '../components/Cubes';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -31,8 +32,24 @@ const Login = () => {
     }
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-base-200 px-4 transition-colors duration-500 font-sans">
-            <div className="card w-full max-w-lg bg-base-100 shadow-2xl relative overflow-visible">
+        <div className="min-h-screen flex items-center justify-center bg-base-200 px-4 transition-colors duration-500 font-sans relative overflow-hidden">
+
+            {/* Background Animation */}
+            <div className="absolute inset-0 z-0">
+                <Cubes
+                    gridSize={8}
+                    maxAngle={45}
+                    radius={3}
+                    borderStyle="2px dashed #B19EEF"
+                    faceColor="#1a1a2e"
+                    rippleColor="#ff6b6b"
+                    rippleSpeed={1.5}
+                    autoAnimate
+                    rippleOnClick
+                />
+            </div>
+
+            <div className="card w-full max-w-lg bg-base-100/90 backdrop-blur-md shadow-2xl relative z-10 overflow-visible border border-base-content/5">
 
                 <form className="card-body items-center text-center p-8 sm:p-12" onSubmit={handleLogin}>
                     <h2 className="card-title text-3xl font-bold tracking-tight mb-2">Welcome Back</h2>
