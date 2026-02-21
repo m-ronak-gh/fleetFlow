@@ -1,0 +1,18 @@
+{
+  "name": "fleetflow",
+  "version": "1.0.0",
+  "description": "FleetFlow is a comprehensive, modular fleet and logistics management system designed to optimize transportation operations. It provides real-time tracking, route optimization, maintenance scheduling, and detailed analytics through a scalable, microservices-based architecture.",
+  "main": "index.js",
+  "scripts": {
+    "dev": "concurrently \"npm run dev --prefix backend\" \"npm run dev --prefix frontend\"",
+    "backend": "npm run dev --prefix backend",
+    "frontend": "npm run dev --prefix frontend",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}
