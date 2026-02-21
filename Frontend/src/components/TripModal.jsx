@@ -40,7 +40,6 @@ const TripModal = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                        {/* Column 1: Asset Details */}
                         <div className="space-y-6">
                             <div className="text-left">
                                 <label className="label py-1">
@@ -81,7 +80,6 @@ const TripModal = ({ isOpen, onClose }) => {
                             </div>
                         </div>
 
-                        {/* Column 2: Route Details */}
                         <div className="space-y-6">
                             <div className="text-left">
                                 <label className="label py-1">
