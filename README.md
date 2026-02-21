@@ -3,6 +3,8 @@
 
 FleetFlow is a comprehensive, modular fleet and logistics management system designed to optimize transportation operations. It provides real-time tracking, route optimization, maintenance scheduling, and detailed analytics through a scalable, microservices-based architecture.
 
+Demo video : https://youtu.be/jn5C-hZWJFI
+
 ### **The Tech Stack**
 
 -Frontend: React (Vite) + Tailwind CSS + DaisyUI (for the "Pill Aesthetic").
@@ -66,4 +68,5 @@ cd Backend && npm install && npm start
 <img width="1884" height="872" alt="Screenshot 2026-02-21 172520" src="https://github.com/user-attachments/assets/20ec78a3-96e4-48bb-84ff-03e8cc44296e" />
 <img width="1902" height="850" alt="Screenshot 2026-02-21 172447" src="https://github.com/user-attachments/assets/ccedca65-9a43-413f-a09e-6209b280cdac" />
 Odoo Hackathon 2026 (Virtual round)
+
 
