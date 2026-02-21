@@ -3,7 +3,7 @@ import { useAuth } from './context/AuthContext';
 import { AuthProvider } from './context/AuthContext';
 import Login from './pages/login';
 import Signup from './pages/Signup';
-import Dashboard from './pages/Dashboard';
+import Dashboard from './pages/dashboard';
 import './App.css';
 
 // Redirect unauthenticated users to /login
