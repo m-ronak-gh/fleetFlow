@@ -1,14 +1,71 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, MapPin, Package, User, Fuel, Truck, Navigation } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const TripModal = ({ isOpen, onClose }) => {
+    const [vehicles, setVehicles] = useState([]);
+    const [drivers, setDrivers] = useState([]);
+    const [formData, setFormData] = useState({
+        vehicle_id: '',
+        driver_id: '',
+        cargo_weight_kg: '',
+        origin: '',
+        destination: '',
+        est_fuel_cost: ''
+    });
+
+    useEffect(() => {
+        if (isOpen) {
+            fetch('http://localhost:4242/api/vehicles')
+                .then(res => res.json())
+                .then(data => setVehicles(data.filter(v => v.status === 'Available')))
+                .catch(err => toast.error('Failed to fetch vehicles'));
+
+            fetch('http://localhost:4242/api/drivers')
+                .then(res => res.json())
+                .then(data => setDrivers(data.filter(d => d.status === 'On Duty')))
+                .catch(err => toast.error('Failed to fetch drivers'));
+        }
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
-    const handleDispatch = (e) => {
+    const handleDispatch = async (e) => {
         e.preventDefault();
-        toast.success('Logistical Trip Authorized');
-        onClose();
+
+        // Safety Lock: License Expiry Check
+        const selectedDriver = drivers.find(d => d.id === formData.driver_id);
+        if (selectedDriver && new Date(selectedDriver.license_expiry) < new Date()) {
+            toast.error('SAFETY LOCK: Operator license has expired. Dispatch blocked.');
+            return;
+        }
+
+        try {
+            const response = await fetch('http://localhost:4242/api/trips', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    vehicle_id: formData.vehicle_id,
+                    driver_id: formData.driver_id,
+                    cargo_weight_kg: parseFloat(formData.cargo_weight_kg),
+                    origin: formData.origin,
+                    destination: formData.destination,
+                    est_fuel_cost: parseFloat(formData.est_fuel_cost) || 0,
+                    status: 'Dispatched'
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to authorize trip');
+            }
+
+            toast.success('Logistical Trip Authorized');
+            onClose();
+            window.location.reload();
+        } catch (error) {
+            toast.error(error.message);
+        }
     };
 
     return (
@@ -40,6 +97,7 @@ const TripModal = ({ isOpen, onClose }) => {
                     </div>
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        {/* Column 1: Asset Details */}
                         <div className="space-y-6">
                             <div className="text-left">
                                 <label className="label py-1">
@@ -47,10 +105,18 @@ const TripModal = ({ isOpen, onClose }) => {
                                 </label>
                                 <label className="input input-bordered flex items-center gap-4 rounded-2xl h-14 w-full bg-white/5 border-white/10 focus-within:border-primary/50 transition-all group">
                                     <Truck size={18} className="opacity-30 group-focus-within:opacity-100 transition-opacity text-primary" />
-                                    <select className="grow bg-transparent text-white font-bold appearance-none focus:outline-none" required>
-                                        <option value="" disabled selected>Choose Asset</option>
-                                        <option value="trp-9021" className="bg-[#1a1a2e]">TRP-9021 (Van-05)</option>
-                                        <option value="trp-9022" className="bg-[#1a1a2e]">TRP-9022 (Truck-02)</option>
+                                    <select
+                                        className="grow bg-transparent text-white font-bold appearance-none focus:outline-none"
+                                        required
+                                        value={formData.vehicle_id}
+                                        onChange={(e) => setFormData({ ...formData, vehicle_id: e.target.value })}
+                                    >
+                                        <option value="" disabled>Choose Asset</option>
+                                        {vehicles.map(v => (
+                                            <option key={v.id} value={v.id} className="bg-[#1a1a2e]">
+                                                {v.license_plate} ({v.name})
+                                            </option>
+                                        ))}
                                     </select>
                                 </label>
                             </div>
@@ -61,7 +127,14 @@ const TripModal = ({ isOpen, onClose }) => {
                                 </label>
                                 <label className="input input-bordered flex items-center gap-4 rounded-2xl h-14 w-full bg-white/5 border-white/10 focus-within:border-primary/50 transition-all group">
                                     <Package size={18} className="opacity-30 group-focus-within:opacity-100 transition-opacity text-primary" />
-                                    <input type="number" className="grow text-white font-bold placeholder:text-white/10" placeholder="0.00" required />
+                                    <input
+                                        type="number"
+                                        className="grow text-white font-bold placeholder:text-white/10"
+                                        placeholder="0.00"
+                                        required
+                                        value={formData.cargo_weight_kg}
+                                        onChange={(e) => setFormData({ ...formData, cargo_weight_kg: e.target.value })}
+                                    />
                                 </label>
                             </div>
 
@@ -71,15 +144,24 @@ const TripModal = ({ isOpen, onClose }) => {
                                 </label>
                                 <label className="input input-bordered flex items-center gap-4 rounded-2xl h-14 w-full bg-white/5 border-white/10 focus-within:border-primary/50 transition-all group">
                                     <User size={18} className="opacity-30 group-focus-within:opacity-100 transition-opacity text-primary" />
-                                    <select className="grow bg-transparent text-white font-bold appearance-none focus:outline-none" required>
-                                        <option value="" disabled selected>Assign Pilot</option>
-                                        <option value="alex" className="bg-[#1a1a2e]">Alex Johnson</option>
-                                        <option value="sarah" className="bg-[#1a1a2e]">Sarah Connor</option>
+                                    <select
+                                        className="grow bg-transparent text-white font-bold appearance-none focus:outline-none"
+                                        required
+                                        value={formData.driver_id}
+                                        onChange={(e) => setFormData({ ...formData, driver_id: e.target.value })}
+                                    >
+                                        <option value="" disabled>Assign Pilot</option>
+                                        {drivers.map(d => (
+                                            <option key={d.id} value={d.id} className="bg-[#1a1a2e]">
+                                                {d.full_name}
+                                            </option>
+                                        ))}
                                     </select>
                                 </label>
                             </div>
                         </div>
 
+                        {/* Column 2: Route Details */}
                         <div className="space-y-6">
                             <div className="text-left">
                                 <label className="label py-1">
@@ -87,7 +169,14 @@ const TripModal = ({ isOpen, onClose }) => {
                                 </label>
                                 <label className="input input-bordered flex items-center gap-4 rounded-2xl h-14 w-full bg-white/5 border-white/10 focus-within:border-primary/50 transition-all group">
                                     <MapPin size={18} className="opacity-30 group-focus-within:opacity-100 transition-opacity text-primary" />
-                                    <input type="text" className="grow text-white font-bold placeholder:text-white/10" placeholder="Sector 7 Hub" required />
+                                    <input
+                                        type="text"
+                                        className="grow text-white font-bold placeholder:text-white/10"
+                                        placeholder="Sector 7 Hub"
+                                        required
+                                        value={formData.origin}
+                                        onChange={(e) => setFormData({ ...formData, origin: e.target.value })}
+                                    />
                                 </label>
                             </div>
 
@@ -97,7 +186,14 @@ const TripModal = ({ isOpen, onClose }) => {
                                 </label>
                                 <label className="input input-bordered flex items-center gap-4 rounded-2xl h-14 w-full bg-white/5 border-white/10 focus-within:border-primary/50 transition-all group">
                                     <Navigation size={18} className="opacity-30 group-focus-within:opacity-100 transition-opacity text-primary" />
-                                    <input type="text" className="grow text-white font-bold placeholder:text-white/10" placeholder="East Port Terminal" required />
+                                    <input
+                                        type="text"
+                                        className="grow text-white font-bold placeholder:text-white/10"
+                                        placeholder="East Port Terminal"
+                                        required
+                                        value={formData.destination}
+                                        onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
+                                    />
                                 </label>
                             </div>
 
@@ -107,7 +203,14 @@ const TripModal = ({ isOpen, onClose }) => {
                                 </label>
                                 <label className="input input-bordered flex items-center gap-4 rounded-2xl h-14 w-full bg-white/5 border-white/10 focus-within:border-primary/50 transition-all group">
                                     <Fuel size={18} className="opacity-30 group-focus-within:opacity-100 transition-opacity text-primary" />
-                                    <input type="number" className="grow text-white font-bold placeholder:text-white/10" placeholder="0.00" required />
+                                    <input
+                                        type="number"
+                                        className="grow text-white font-bold placeholder:text-white/10"
+                                        placeholder="0.00"
+                                        required
+                                        value={formData.est_fuel_cost}
+                                        onChange={(e) => setFormData({ ...formData, est_fuel_cost: e.target.value })}
+                                    />
                                 </label>
                             </div>
                         </div>
@@ -123,5 +226,6 @@ const TripModal = ({ isOpen, onClose }) => {
         </div>
     );
 };
+
 
 export default TripModal;

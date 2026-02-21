@@ -1,14 +1,53 @@
-import React from 'react';
-import { X, ClipboardList, Calendar, Truck, ShieldAlert } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { X, ClipboardList, Calendar, Truck, ShieldAlert, Wallet } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const ServiceModal = ({ isOpen, onClose }) => {
+    const [vehicles, setVehicles] = useState([]);
+    const [formData, setFormData] = useState({
+        vehicle_id: '',
+        description: '',
+        date: new Date().toISOString().split('T')[0],
+        amount: ''
+    });
+
+    useEffect(() => {
+        if (isOpen) {
+            fetch('http://localhost:4242/api/vehicles')
+                .then(res => res.json())
+                .then(data => setVehicles(data))
+                .catch(err => toast.error('Failed to fetch vehicles'));
+        }
+    }, [isOpen]);
+
     if (!isOpen) return null;
 
-    const handleServiceRequest = (e) => {
+    const handleServiceRequest = async (e) => {
         e.preventDefault();
-        toast.success('Maintenance Protocol Logged');
-        onClose();
+        try {
+            const response = await fetch('http://localhost:4242/api/logs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    vehicle_id: formData.vehicle_id,
+                    type: 'Maintenance',
+                    amount: parseFloat(formData.amount) || 0,
+                    description: formData.description,
+                    date: formData.date
+                })
+            });
+
+            if (!response.ok) {
+                const error = await response.json();
+                throw new Error(error.error || 'Failed to log service');
+            }
+
+            toast.success('Maintenance Protocol Logged');
+            onClose();
+            window.location.reload();
+        } catch (error) {
+            toast.error(error.message);
+        }
     };
 
     return (
@@ -46,7 +85,19 @@ const ServiceModal = ({ isOpen, onClose }) => {
                             </label>
                             <label className="input input-bordered flex items-center gap-4 rounded-2xl h-14 w-full bg-white/5 border-white/10 focus-within:border-error/50 transition-all shadow-inner group">
                                 <Truck size={18} className="opacity-30 group-focus-within:opacity-100 transition-opacity text-error" />
-                                <input type="text" className="grow text-white font-bold placeholder:text-white/10 uppercase" placeholder="TRP-XXXX" required />
+                                <select
+                                    className="grow bg-transparent text-white font-bold appearance-none focus:outline-none"
+                                    required
+                                    value={formData.vehicle_id}
+                                    onChange={(e) => setFormData({ ...formData, vehicle_id: e.target.value })}
+                                >
+                                    <option value="" disabled>Choose Asset</option>
+                                    {vehicles.map(v => (
+                                        <option key={v.id} value={v.id} className="bg-[#1a1a2e]">
+                                            {v.license_plate} ({v.name})
+                                        </option>
+                                    ))}
+                                </select>
                             </label>
                         </div>
 
@@ -60,18 +111,44 @@ const ServiceModal = ({ isOpen, onClose }) => {
                                     className="textarea textarea-bordered w-full rounded-2xl min-h-[120px] bg-white/5 border-white/10 focus:border-error/50 transition-all pl-12 text-white font-medium placeholder:text-white/10"
                                     placeholder="Describe the issues or required services..."
                                     required
+                                    value={formData.description}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                                 ></textarea>
                             </div>
                         </div>
 
-                        <div className="text-left">
-                            <label className="label py-1">
-                                <span className="label-text-alt font-black uppercase tracking-[0.3em] text-white/30 text-[9px]">Service Date</span>
-                            </label>
-                            <label className="input input-bordered flex items-center gap-4 rounded-2xl h-14 w-full bg-white/5 border-white/10 focus-within:border-error/50 transition-all shadow-inner group">
-                                <Calendar size={18} className="opacity-30 group-focus-within:opacity-100 transition-opacity text-error" />
-                                <input type="date" className="grow text-white font-bold placeholder:text-white/10 [color-scheme:dark]" required />
-                            </label>
+                        <div className="grid grid-cols-2 gap-6">
+                            <div className="text-left">
+                                <label className="label py-1">
+                                    <span className="label-text-alt font-black uppercase tracking-[0.3em] text-white/30 text-[9px]">Service Date</span>
+                                </label>
+                                <label className="input input-bordered flex items-center gap-4 rounded-2xl h-14 w-full bg-white/5 border-white/10 focus-within:border-error/50 transition-all shadow-inner group">
+                                    <Calendar size={18} className="opacity-30 group-focus-within:opacity-100 transition-opacity text-error" />
+                                    <input
+                                        type="date"
+                                        className="grow text-white font-bold placeholder:text-white/10 [color-scheme:dark]"
+                                        required
+                                        value={formData.date}
+                                        onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+                                    />
+                                </label>
+                            </div>
+                            <div className="text-left">
+                                <label className="label py-1">
+                                    <span className="label-text-alt font-black uppercase tracking-[0.3em] text-white/30 text-[9px]">Cost (Est.)</span>
+                                </label>
+                                <label className="input input-bordered flex items-center gap-4 rounded-2xl h-14 w-full bg-white/5 border-white/10 focus-within:border-error/50 transition-all shadow-inner group">
+                                    <Wallet size={18} className="opacity-30 group-focus-within:opacity-100 transition-opacity text-error" />
+                                    <input
+                                        type="number"
+                                        className="grow text-white font-bold placeholder:text-white/10"
+                                        placeholder="0.00"
+                                        required
+                                        value={formData.amount}
+                                        onChange={(e) => setFormData({ ...formData, amount: e.target.value })}
+                                    />
+                                </label>
+                            </div>
                         </div>
                     </div>
 
@@ -85,5 +162,6 @@ const ServiceModal = ({ isOpen, onClose }) => {
         </div>
     );
 };
+
 
 export default ServiceModal;

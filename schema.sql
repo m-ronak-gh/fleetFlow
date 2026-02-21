@@ -14,8 +14,11 @@ CREATE TABLE vehicles (
 CREATE TABLE drivers (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   full_name TEXT NOT NULL,
+  license_number TEXT UNIQUE NOT NULL,
   license_expiry DATE NOT NULL,
   safety_score INTEGER DEFAULT 100,
+  complaints_count INTEGER DEFAULT 0,
+  completion_rate NUMERIC DEFAULT 0,
   status TEXT DEFAULT 'On Duty' CHECK (status IN ('On Duty', 'Off Duty', 'Suspended')),
   created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
@@ -26,6 +29,9 @@ CREATE TABLE trips (
   vehicle_id UUID REFERENCES vehicles(id),
   driver_id UUID REFERENCES drivers(id),
   cargo_weight_kg NUMERIC NOT NULL,
+  origin TEXT NOT NULL,
+  destination TEXT NOT NULL,
+  est_fuel_cost NUMERIC,
   status TEXT DEFAULT 'Draft' CHECK (status IN ('Draft', 'Dispatched', 'Completed', 'Cancelled')),
   start_odometer INTEGER,
   end_odometer INTEGER,
