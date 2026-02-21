@@ -1,17 +1,35 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useAuth } from './context/AuthContext';
+import { AuthProvider } from './context/AuthContext';
 import Login from './pages/login';
 import Signup from './pages/Signup';
-import './App.css'
+import Dashboard from './pages/Dashboard';
+import './App.css';
 
-function App() {
+// Redirect unauthenticated users to /login
+function ProtectedRoute({ children }) {
+  const { user, loading } = useAuth();
+  if (loading) return <div className="min-h-screen flex items-center justify-center"><span className="loading loading-spinner loading-lg" /></div>;
+  return user ? children : <Navigate to="/login" replace />;
+}
+
+function AppRoutes() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/signup" element={<Signup />} />
-      <Route path="/" element={<Navigate to="/login" />} />
+      <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+      <Route path="/" element={<Navigate to="/login" replace />} />
     </Routes>
   );
 }
 
+function App() {
+  return (
+    <AuthProvider>
+      <AppRoutes />
+    </AuthProvider>
+  );
+}
 
-export default App
+export default App;

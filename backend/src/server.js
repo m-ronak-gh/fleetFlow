@@ -4,6 +4,7 @@ require('dotenv').config();
 
 const rateLimiter = require('./middleware/rateLimiter');
 
+const authRoutes = require('./routes/authRoutes');
 const vehiclesRoutes = require('./routes/vehiclesRoutes');
 const driversRoutes = require('./routes/driversRoutes');
 const tripsRoutes = require('./routes/tripsRoutes');
@@ -12,11 +13,12 @@ const logsRoutes = require('./routes/logsRoutes');
 const app = express();
 
 // Middleware
-app.use(cors());
+app.use(cors({ origin: 'http://localhost:5173', credentials: true }));
 app.use(express.json());
 app.use(rateLimiter);
 
 // Routes
+app.use('/api/auth', authRoutes);
 app.use('/api/vehicles', vehiclesRoutes);
 app.use('/api/drivers', driversRoutes);
 app.use('/api/trips', tripsRoutes);
