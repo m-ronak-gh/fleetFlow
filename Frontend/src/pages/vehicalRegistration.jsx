@@ -10,7 +10,6 @@ const VehicleRegistration = ({ onNewVehicle }) => {
                     <h2 className="text-2xl font-black text-[#52b1ff] uppercase tracking-tighter leading-none">Fleet Flow</h2>
                     <p className="text-[10px] text-white/20 font-bold uppercase tracking-[0.3em]">Asset Management Protocol</p>
                 </div>
-                <div className="w-6 h-6 rounded-full border-2 border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]"></div>
             </div>
 
             {/* Command Search Row */}
