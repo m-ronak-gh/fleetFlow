@@ -13,6 +13,9 @@ import ServiceModal from '../components/ServiceModal';
 import TripDispatch from './tripdispatch';
 import Maintenance from './maintance';
 import VehicleRegistration from './vehicalRegistration';
+import FuelExpense from './fuelExpense';
+import ExpenseModal from '../components/ExpenseModal';
+import Analytics from './analatics';
 
 const Dashboard = () => {
     const [isNavOpen, setIsNavOpen] = useState(false);
@@ -20,6 +23,7 @@ const Dashboard = () => {
     const [isVehicleModalOpen, setIsVehicleModalOpen] = useState(false);
     const [isTripModalOpen, setIsTripModalOpen] = useState(false);
     const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
+    const [isExpenseModalOpen, setIsExpenseModalOpen] = useState(false);
 
     const navItems = [
         { id: 'dashboard', label: 'Dashboard', icon: LayoutGrid },
@@ -323,6 +327,10 @@ const Dashboard = () => {
                     <Maintenance onCreateService={() => setIsServiceModalOpen(true)} />
                 ) : activeTab === 'vehicles' ? (
                     <VehicleRegistration onNewVehicle={() => setIsVehicleModalOpen(true)} />
+                ) : activeTab === 'expense' ? (
+                    <FuelExpense onAddExpense={() => setIsExpenseModalOpen(true)} />
+                ) : activeTab === 'analytics' ? (
+                    <Analytics />
                 ) : (
                     <div className="flex items-center justify-center h-[60vh] text-white/20 font-black uppercase tracking-[1em]">Operational View Pending</div>
                 )}
@@ -340,6 +348,10 @@ const Dashboard = () => {
             <ServiceModal
                 isOpen={isServiceModalOpen}
                 onClose={() => setIsServiceModalOpen(false)}
+            />
+            <ExpenseModal
+                isOpen={isExpenseModalOpen}
+                onClose={() => setIsExpenseModalOpen(false)}
             />
         </div>
     );

@@ -7,7 +7,6 @@ const TripDispatch = ({ onNewTrip }) => {
             {/* Mockup Header: Fleet Flow */}
             <div className="flex justify-between items-center bg-white/5 backdrop-blur-3xl p-8 rounded-[2.5rem] border border-white/10 shadow-2xl">
                 <h2 className="text-2xl font-black text-[#52b1ff] uppercase tracking-tighter">Fleet Flow</h2>
-                <div className="w-6 h-6 rounded-full border-2 border-orange-500 shadow-[0_0_10px_rgba(249,115,22,0.5)]"></div>
             </div>
 
             {/* Command Search Row */}
