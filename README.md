@@ -61,4 +61,9 @@ cd Backend && npm install && npm start
 ```
 > [!IMPORTANT]
 > Environment Variables: Create a .env in both folders with your SUPABASE_URL and SUPABASE_KEY.
+<img width="1875" height="871" alt="Screenshot 2026-02-21 172547" src="https://github.com/user-attachments/assets/dd46d2cf-2922-4508-bb4b-d1be33572297" />
+<img width="1899" height="872" alt="Screenshot 2026-02-21 172535" src="https://github.com/user-attachments/assets/3ef28f7d-458d-4cdc-9556-0035dfe5e5cf" />
+<img width="1884" height="872" alt="Screenshot 2026-02-21 172520" src="https://github.com/user-attachments/assets/20ec78a3-96e4-48bb-84ff-03e8cc44296e" />
+<img width="1902" height="850" alt="Screenshot 2026-02-21 172447" src="https://github.com/user-attachments/assets/ccedca65-9a43-413f-a09e-6209b280cdac" />
 Odoo Hackathon 2026 (Virtual round)
+
